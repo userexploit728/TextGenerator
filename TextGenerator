@@ -1,0 +1,45 @@
+-- Script to auto-respond based on chat messages around the player
+
+local Players = game:GetService("Players")
+local player = Players.LocalPlayer
+
+-- Function to generate a response based on the input message
+local function generateResponse(message)
+    -- Basic response generation logic (can be expanded)
+    local responses = {
+        ["hello"] = "Hi there! How are you?",
+        ["help"] = "Sure, what do you need help with?",
+        ["game"] = "This game is so much fun!",
+        ["bye"] = "Goodbye! See you later!"
+    }
+    
+    for keyword, response in pairs(responses) do
+        if string.find(string.lower(message), string.lower(keyword)) then
+            return response
+        end
+    end
+    
+    return "I'm not sure how to respond to that."
+end
+
+-- Function to handle new chat messages
+local function onPlayerChatted(playerChat, message)
+    if playerChat ~= player then
+        local response = generateResponse(message)
+        player:Chat(response)
+    end
+end
+
+-- Connect the function to the chat event for all players
+for _, p in pairs(Players:GetPlayers()) do
+    p.Chatted:Connect(function(message)
+        onPlayerChatted(p, message)
+    end)
+end
+
+-- Connect the function to new players joining
+Players.PlayerAdded:Connect(function(newPlayer)
+    newPlayer.Chatted:Connect(function(message)
+        onPlayerChatted(newPlayer, message)
+    end)
+end)
